@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Feb 14 14:37:13 2023
-
-@author: vikas
-"""
 
 import os
 import time
@@ -13,17 +7,6 @@ import flwr as fl
 import tensorflow as tf
 import numpy as np
 from sklearn.metrics import confusion_matrix, classification_report
-
-'''
-import os
-os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
-os.environ['TF_ENABLE_GPU_GARBAGE_COLLECTION']='false'
-
-import tensorflow as tf
-gpus = tf.config.experimental.list_physical_devices('GPU')
-for gpu in gpus:
-  tf.config.experimental.set_memory_growth(gpu, True)
-'''
 
 import time
 import shutil
@@ -87,45 +70,6 @@ from tensorflow.keras.metrics import categorical_crossentropy
 from sklearn.metrics import roc_curve, auc, RocCurveDisplay
 from sklearn.preprocessing import label_binarize
 from itertools import cycle
-
-
-def plot_multiclass_roc(clf, X_test, y_test, n_classes,fcntr):
-    """
-    Plot multi-class ROC curves with micro and macro averages
-    """
-    # Binarize the output for multiclass
-    y_test_bin = label_binarize(y_test, classes=range(0, n_classes))
-
-    y_score = clf.predict(X_test)
-
-    # Compute ROC curve and ROC area for each class
-    fpr = dict()
-    tpr = dict()
-    roc_auc = dict()
-
-    for i in range(n_classes):
-        fpr[i], tpr[i], _ = roc_curve(y_test_bin[:, i], y_score[:, i])
-        roc_auc[i] = auc(fpr[i], tpr[i])
-
-    # Plot all ROC curves
-    plt.figure(figsize=(4, 4))
-    colors = cycle(['blue', 'red', 'green','Yellow','black', 'orange'])
-    for i, color in zip(range(n_classes), colors):
-        plt.plot(fpr[i], tpr[i], color=color, lw=2,
-                 label='ROC curve of class {0} (area = {1:0.2f})'
-                 ''.format(i, roc_auc[i]))
-
-    plt.plot([0, 1], [0, 1], 'k--', lw=2)
-    plt.xlim([0.0, 1.0])
-    plt.ylim([0.0, 1.05])
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
-    plt.title('Multiclass ROC - IID Client - '+fcntr)
-    plt.legend(loc="lower right")
-    plt.grid(True)
-    plt.tight_layout()
-    plt.savefig("IID-ROC-Client"+fcntr+".jpeg")
-
 
 def create_model():
     # Create Model Structure
@@ -192,10 +136,6 @@ def start_client(dataset: DATASET, fcntr) -> None:
             fl = open(path+"EvalRes"+str(fcntr)+".csv", "a+")
             fl.write(str(fcntr)+","+str(loss)+","+str(accuracy)+","+str(recall)+","+str(Precision)+"\n")
             fl.close()
-            dfNor3 = pd.DataFrame(confusion_matrix(label, pred))
-            
-            dfNor3.to_csv(path+"Conf//Confusion_IID"+str(fcntr)+".csv",mode='a')
-            
             auc_scores = plot_multiclass_roc(model, x_test, y_test, y_test.shape[1],str(fcntr))
 
             

@@ -28,9 +28,6 @@ len(files)
 for i in range(0,1):
     algorithm = 'from tensorflow.keras.applications.'+prep[i]+ ' import '+algos[i]
     preprocess = 'from tensorflow.keras.applications.'+prep[i]+ ' import preprocess_input'
-    exec(algorithm)
-    exec(preprocess)
-    exec('model ='+algos[i]+'()')
     model = Model(inputs = model.inputs, outputs = model.layers[-2].output)
     model.summary()
 
@@ -57,8 +54,3 @@ for i in range(0,1):
     labels
 
     values_dec = values.reshape(values.shape[0], values.shape[1]*values.shape[2])
-    X = values_dec
-    y = labels
-
-    np.save('CombinedNpyData//'+algos[i]+'_X.npy', X)
-    np.save('CombinedNpyData//'+algos[i]+'_Y.npy', y)
